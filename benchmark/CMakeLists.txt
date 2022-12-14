@@ -14,5 +14,5 @@ file(GLOB ParallelBenchmark_src CONFIGURE_DEPENDS "*.hpp" "*.cpp")
 include_directories(${PROJECT_SOURCE_DIR}../include)
 
 add_executable(ParallelBenchmark ${ParallelBenchmark_src})
-target_link_libraries(ParallelBenchmark Threads::Threads -ltbb)
+target_link_libraries(ParallelBenchmark Threads::Threads)
 
