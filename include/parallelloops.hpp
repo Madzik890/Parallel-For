@@ -4,7 +4,7 @@
 #include <algorithm>  
 #include <array>
 #include <cassert>
-#include <deque>
+#include <vector>
 #include <functional>
 #include <future>
 
@@ -18,13 +18,10 @@ namespace Parallel
         const auto size = end - begin;
         assert(size > 0);
 
-        auto threadPool =  std::vector<std::thread>();
-
+        auto threadPool =  std::vector<std::future<void>>(size);
         for (auto it = begin; it != end; it++) {
-            threadPool.push_back(std::thread(function, std::ref(*it)));
-        }
-
-        std::for_each(threadPool.begin(), threadPool.end(), [](std::thread & thread) { if (thread.joinable()) thread.join(); });
+            threadPool.push_back(std::async(function, std::ref(*it)));
+        }                
     };
 
     template<typename Iterator, typename Function>
@@ -44,7 +41,7 @@ namespace Parallel
             }
         };   
         
-        auto threadPool =  std::deque<std::thread>();
+        auto threadPool =  std::vector<std::future<void>>(threadPoolSize);
         auto iteratorBound = size / threadPoolSize;
         for(int i = 0; i < threadPoolSize; i++)
         {
@@ -52,14 +49,12 @@ namespace Parallel
             {   
                 const auto bound = iteratorBound;
                 iteratorBound = (size / threadPoolSize) + size % threadPoolSize;
-                threadPool.push_back(std::thread(threadFunction, begin + (bound * i), iteratorBound));
+                threadPool[i] = std::async(threadFunction, begin + (bound * i), iteratorBound);
                 break;
             }
-            
-            threadPool.push_back(std::thread(threadFunction, begin + (iteratorBound * i), iteratorBound));
-        }
-
-        std::for_each(threadPool.begin(), threadPool.end(), [](std::thread & thread) { if (thread.joinable()) thread.join(); });
+                        
+            threadPool[i] = std::async(threadFunction, begin + (iteratorBound * i), iteratorBound);
+        }      
     };
 }
 
