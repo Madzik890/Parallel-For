@@ -2,14 +2,13 @@
 #include <chrono>
 #include <random>
 #include <vector>
-#include <execution>
 
 #include "../include/parallelloops.hpp"
 
-constexpr const auto VECTOR_SIZE = 100000000;
+constexpr const auto VECTOR_SIZE = 90000000;
 static std::vector<int> vector(VECTOR_SIZE);
 
-inline auto GenerateFunction = [](int value) {
+auto GenerateFunction = [](int value) {
     static thread_local std::mt19937 generator;
     std::uniform_int_distribution<int> distribution(-100,100);
     value = distribution(generator);
@@ -23,11 +22,6 @@ inline void generate() noexcept
 inline void parallelGenerate() noexcept
 { 
     Parallel::ForeachRestricted(vector.begin(), vector.end(), GenerateFunction);
-}
-
-inline void executionGenerate() noexcept
-{       
-    std::for_each(std::execution::par, vector.begin(), vector.end(), GenerateFunction);     
 }
 
 int main()
@@ -44,13 +38,6 @@ int main()
         parallelGenerate();
         const auto end = std::chrono::steady_clock::now();
         std::cout << "Parallel thread generate: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" << std::endl;
-    }
-    
-    {
-        const auto begin = std::chrono::steady_clock::now();
-        executionGenerate();
-        const auto end = std::chrono::steady_clock::now();
-        std::cout << "Execution generate      : " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" << std::endl;    
     }
 
     return 0;

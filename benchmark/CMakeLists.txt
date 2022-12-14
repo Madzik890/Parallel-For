@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 
 project(ParallelBenchmark)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O2")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
